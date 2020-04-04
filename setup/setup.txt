@@ -1,0 +1,78 @@
+Add this to rc.Local
+python3 [path to sauna.py] &
+
+
+Configure xinitrc
+sudo nano /etc/X11/xinit/xinitrc
+Comment this line
+
+. /etc/X11/xsession
+Add this line to start openbox
+
+exec openbox-session
+
+
+
+Step 7: Edit Openbox config
+The Openbox window manager will be used to launch the Chromium browser.
+
+When Openbox launches at startup it will run two scripts in the /etc/xdg/openbox folder. The first, environment will setup any environment variables, etc. The second, autostart will setup and launch whatever app you specify.
+
+First I will show you how to edit the autostart file and then how to add environment variables to support it.
+
+Open up autostart in an editor:
+
+sudo nano /etc/xdg/openbox/autostart
+Update the autostart file by adding the text below.
+
+First, add commands to turn off power management, screen blanking and screen saving. We don’t want those features in a kiosk.
+
+xset -dpms			# turn off display power management system
+xset s noblank		# turn off screen blanking
+xset s off			# turn off screen saver
+Next if Chromium crashed it may pop up error messages next time it starts. This is another feature that we don’t want in a kiosk.
+
+# Remove exit errors from the config files that could trigger a warning
+  
+sed -i 's/"exited_cleanly":false/"exited_cleanly":true/' ~/.config/chromium/'Local State'
+  
+sed -i 's/"exited_cleanly":false/"exited_cleanly":true/; s/"exit_type":"[^"]\+"/"exit_type":"Normal"/' ~/.config/chromium/Default/Preferences
+Finally, update autostart to run the Chromium browser in kiosk mode. Pass in an environment variable ($KIOSK_URL) that contains the URL of the Web app to launch.
+
+# Run Chromium in kiosk mode
+chromium-browser  --noerrdialogs --disable-infobars --kiosk $KIOSK_URL
+In the next step, I will show you how to set $KIOSK_URL.
+
+To save the autostart file in nano, press Ctrl-o, hit enter, then press Ctrl-X.
+
+Step 8. Setup the environment
+Edit the Openbox environment file:
+
+sudo nano /etc/xdg/openbox/environment
+Add the KIOSK_URL to the file:
+
+export KIOSK_URL=https://desertbot.io
+This is so that you can change the URL simply by remote-logging in, editing the environment file and rebooting.
+
+Step 9. Start the X server on boot
+See if ~/.bash_profile already exists:
+
+ls -la ~/.bash_profile
+If NOT, then create an empty version:
+
+touch ~/.bash_profile
+Edit ~/.bash_profile:
+
+sudo nano ~/.bash_profile
+Add this line to start the X server on boot. Because I am using a touch screen I’m passing in the flag to remove the cursor.
+
+[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor
+Save and exit the file by pressing Ctrl-o, enter, Ctrl-X.
+
+From the command line run:
+
+source ~/.bash_profile
+If you had no errors, reboot
+
+sudo reboot
+After the server runs through its startup sequence, the browser should be launched and fill the whole screen.
