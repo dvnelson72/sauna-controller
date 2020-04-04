@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Sauna Temperature</title>
+    <link rel="stylesheet" href="../static/style.css/">
+    <script src="../static/control.js"></script>
+</head>
+
+<body>
+    <div id='panel'>
+        <div class="set-temp">
+            <div class="heading">Target</div>
+                <div class="led_display ">
+                    <div class="digit">
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                    </div>
+                    <div class="digit">
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                    </div>
+                    <div class="digit">
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="set-time">
+            <div class="heading">Time</div>
+                <div class="led_display ">
+                    <div class="digit">
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                    </div>
+                    <div class="digit">
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                    </div>
+                    <div class="digit">
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                        <div class="segment" style="background:#4286f4;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="current-temp">
+            <div class="heading">Current</div>
+            <div class="led_display">
+                <div class="digit">
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                </div>
+                <div class="digit">
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                </div>
+                <div class="digit">
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                    <div class="segment"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="target-controls">
+            <div>
+                <img src="/static/up.png" class="updown-img" onclick="targetUp()"/>
+            </div>
+            <div>
+                <img src="/static/down.png" class="updown-img" onclick="targetDown()"/>
+            </div>
+        </div> 
+        <div class="time-controls">
+            <div>
+                <img src="/static/up.png" class="updown-img" onclick="timeUp()"/>
+            </div>
+            <div>
+                <img src="/static/down.png" class="updown-img" onclick="timeDown()"/>
+            </div>
+        </div>
+        
+        <div class="heater-status">
+            <img id="heaterStatus" src="/static/heater-off.png" class="heater-status-img"/>
+        </div>
+        <div class="onoff-status" onclick="toggleOnOff()">
+            <img id="onoffStatus" src="/static/off.png" class="onoff-status-img"/>
+        </div>
+    </div>
+</body>
+
+</html>
