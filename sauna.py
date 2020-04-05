@@ -223,8 +223,6 @@ def onoffToggle():
     onoffValue = not onoffValue
     
     if onoffValue:
-        defaultTime = currentTime
-        defaultTemp = targetTemp
         writeConfigs()
         timerLastCountdown = int(round(time.time() * 1000))
         print(f"SET TIME {timerLastCountdown}")
