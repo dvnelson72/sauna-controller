@@ -114,8 +114,9 @@ def controlSauna():
         
         canToggle = False
         
+        # heaterToggleThreshold is for dampening on/off cycles
         millis = int(round(time.time() * 1000))
-        if (millis - lastToggleHeater > 500):
+        if (millis - lastToggleHeater > heaterToggleThreshold):
             canToggle = True
         
         if (canToggle and needsToggle):
