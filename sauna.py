@@ -2,9 +2,14 @@ from flask import Flask, request, render_template, jsonify
 import datetime
 import time, threading, math
 import RPi.GPIO as GPIO
+import json
+import re
+from flask import jsonify
 
 app = Flask(__name__)
 
+global configsFile
+global configs
 global defaultTime
 global defaultTemp
 global heaterValue
@@ -18,22 +23,40 @@ global relayPin1
 global relayPin2
 global timerLastCountdown
 
-defaultTime = 90
-defaultTemp = 160
+configsFile = "config.json"
+
+with open(configsFile, 'r') as c:
+    configs = json.loads(c.read())
+    
+defaultTime = configs['defaultTime']
+defaultTemp = configs['defaultTemp']
 heaterValue = False
 onoffValue = False
-currentTime = defaultTime
 currentTemp = 75
+currentTime = defaultTime
 targetTemp = defaultTemp
 lastToggleHeater = 0
 heaterToggleThreshold = 10000
 relayPin1 = 17
 relayPin2 = 27
 timerLastCountdown = 0
-
+    
 GPIO.setmode(GPIO.BCM)    
 GPIO.setup(relayPin1, GPIO.OUT)
 GPIO.setup(relayPin2, GPIO.OUT)
+
+def writeConfigs():
+    global configsFile
+    global configs
+    global defaultTime
+    global defaultTemp
+    
+    configs['defaultTime'] = defaultTime
+    configs['defaultTemp'] = defaultTemp
+    
+    with open(configsFile, "w") as f:
+        f.write(json.dumps(configs))
+        f.truncate()
 
 def countdown():
     global heaterValue
@@ -138,13 +161,25 @@ def getTargetTemp():
 @app.route("/target-inc")
 def targetInc():
     global targetTemp
+    global defaultTemp
+    
     targetTemp = targetTemp + 5
+    
+    if (not onoffValue):
+        defaultTemp = targetTemp
+        
     return f"{targetTemp}"
     
 @app.route("/target-dec")
 def targetDec():
     global targetTemp
+    global defaultTemp
+    
     targetTemp = targetTemp - 5
+    
+    if (not onoffValue):
+        defaultTemp = targetTemp
+        
     return f"{targetTemp}"
     
 @app.route("/current-time")
@@ -155,17 +190,31 @@ def getCurrentTime():
 @app.route("/time-inc")
 def timeInc():
     global currentTime
+    global defaultTime
+    
     currentTime = (int(math.floor(currentTime / 5.0)) * 5) + 5
+    
+    if (not onoffValue):
+        defaultTime = currentTime
+        
     return f"{currentTime}"
     
 @app.route("/time-dec")
 def timeDec():
     global currentTime
+    global defaultTime
+    
     currentTime = (int(math.ceil(currentTime / 5.0)) * 5) - 5
+    
+    if (not onoffValue):
+        defaultTime = currentTime
+        
     return f"{currentTime}"
     
 @app.route("/onoff-toggle")
 def onoffToggle():
+    global defaultTime
+    global defaultTemp
     global onoffValue
     global heaterValue
     global timerLastCountdown
@@ -173,6 +222,9 @@ def onoffToggle():
     onoffValue = not onoffValue
     
     if onoffValue:
+        defaultTime = currentTime
+        defaultTemp = targetTemp
+        writeConfigs()
         timerLastCountdown = int(round(time.time() * 1000))
         print(f"SET TIME {timerLastCountdown}")
         return "1"
