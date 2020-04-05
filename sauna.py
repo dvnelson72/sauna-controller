@@ -45,7 +45,7 @@ def countdown():
     global heaterToggleThreshold
     global timerLastCountdown
     
-    decInterval = 10000
+    decInterval = 60000
     
     if onoffValue:
         if (currentTime>0):            
