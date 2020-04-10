@@ -11,7 +11,7 @@ var digitSegments = [
     [1, 2, 3, 4, 5, 6, 7],
     [1, 2, 7, 3, 6]
 ]
-var baseUrl = "http://192.168.15.182";
+var baseUrl = "http://192.168.15.183";
 
 var toggleOnOff = function() {
     fetch(baseUrl + '/onoff-toggle')

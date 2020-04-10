@@ -3,7 +3,7 @@ import datetime
 import time, threading, math
 import RPi.GPIO as GPIO
 import json
-import re
+import pigpio
 from flask import jsonify
 
 app = Flask(__name__)
@@ -22,8 +22,14 @@ global heaterToggleThreshold
 global relayPin1
 global relayPin2
 global timerLastCountdown
+global sensor 
 
 configsFile = "config.json"
+SENSOR_BUS = 0
+SENSOR_CLIENT = 0
+
+pi = pigpio.pi()
+sensor = pi.spi_open(0, 1000000, 0)
 
 with open(configsFile, 'r') as c:
     configs = json.loads(c.read())
@@ -36,7 +42,7 @@ currentTemp = 75
 currentTime = defaultTime
 targetTemp = defaultTemp
 lastToggleHeater = 0
-heaterToggleThreshold = 10000
+heaterToggleThreshold = 5000
 relayPin1 = 17
 relayPin2 = 27
 timerLastCountdown = 0
@@ -45,6 +51,19 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(relayPin1, GPIO.OUT)
 GPIO.setup(relayPin2, GPIO.OUT)
 
+def getTemperature():
+    t = 0
+    c, d = pi.spi_read(sensor, 2)
+    if c == 2:
+        word = (d[0]<<8) | d[1]
+        if (word & 0x8006) == 0: # Bits 15, 2, and 1 should be zero.
+            t = (word >> 3)/4.0
+            t = (t * 9 /5)+32
+        else:
+            print("bad reading {:b}".format(word))
+    
+    return t
+    
 def writeConfigs():
     global configsFile
     global configs
@@ -94,6 +113,9 @@ def controlSauna():
     global defaultTime
     global defaultTemp
     
+    currentTemp = getTemperature()
+    #print(currentTemp)
+    
     countdown()
     
     if (currentTime<=0):
@@ -136,7 +158,8 @@ def controlSauna():
         GPIO.output(relayPin1, 0)
         GPIO.output(relayPin2, 0)
         
-    threading.Timer(0.05, controlSauna).start()
+    threading.Timer(0.5, controlSauna).start()
+    
 controlSauna()
 
 @app.route("/")
