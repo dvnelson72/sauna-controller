@@ -1,0 +1,13 @@
+Anyone browsing...
+
+I have a cat5 connector on my pi.  That cable goes to the power center for the sauna.  This is my cable connection mapping.
+
+			cat5		pi-cable	pi			
+			brown 		brown		gpio-17	
+			brown-st	grey		gnd
+			green		green		therm-green
+			green-st	yellow		therm-yellow
+			orange		orange		3.3v
+			oragne-st	red			5.5v
+			blue		blue		therm-orange
+			blue-st		purple		(relay 2)
