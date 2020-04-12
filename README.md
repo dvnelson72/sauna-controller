@@ -74,7 +74,7 @@ It has a 3V/Gnd connection... soldered to thermocouple 3V/Gnd with the Thermocou
 
 It also has a trigger that is attached to one of the GPIO pins from the Cat5 (GPIO17 for me).
 
-####High Voltage Relay
+#### High Voltage Relay
 The high voltage relay was a real pain in the ass.  The 5V trigger killed me.  That is why I have the low voltage relay.
 
 The high voltage relay is interesting.  It has 120V input.  It also has 5V output.  In high mode, if you touch the 5V output to the 5v triggers, it flips the relay.
@@ -89,14 +89,14 @@ So -- low voltage relay basically connects the high voltage relay's 5V output to
 
 NOW on the power side of the high voltage relay... We attach AC hot to both relay commons.  Then, we attach white/black (front/back) wires to the normally closed high voltage pins for each relay.
 
-####Pi Power
+#### Pi Power
 I destroyed a microUSB power plug.  I cut the wire in two.
 
 The microUSB part, is down by the Pi, soldered to the Cat5.
 
 The transformer part is up at the power parts, and the ground/5V are soldered to respective Cat5 wires.
 
-#Does it work?
+# Does it work?
 yes.
 
 The program might need a little refinement over time.  It basically copies the functionality from my original controller:
