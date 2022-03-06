@@ -11,18 +11,26 @@ var digitSegments = [
     [1, 2, 3, 4, 5, 6, 7],
     [1, 2, 7, 3, 6]
 ]
-var baseUrl = "http://192.168.15.183";
+var baseUrl = window.location.origin;
+var params = new URLSearchParams(window.location.search);
+var key = params.get("key") || "nokey";
+
+function getQueryParams(qs) {
+    qs = qs.split('+').join(' ');
+
+    var params = {},
+        tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+    while (tokens = re.exec(qs)) {
+        params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+    }
+
+    return params;
+}
 
 var toggleOnOff = function() {
-    fetch(baseUrl + '/onoff-toggle')
-        .then(() => {
-            if (refreshData) {
-                refreshData();
-            }
-        });
-}
-var refreshData = function() {
-    fetch(baseUrl + '/onoff-toggle')
+    fetch(baseUrl + '/onoff-toggle?key='+key)
         .then(() => {
             if (refreshData) {
                 refreshData();
@@ -30,7 +38,7 @@ var refreshData = function() {
         });
 }
 var targetUp = function() {
-    fetch(baseUrl + '/target-inc')
+    fetch(baseUrl + '/target-inc?key='+key)
         .then(() => {
             if (refreshData) {
                 refreshData();
@@ -38,7 +46,7 @@ var targetUp = function() {
         });
 }
 var targetDown = function() {
-    fetch(baseUrl + '/target-dec')
+    fetch(baseUrl + '/target-dec?key='+key)
         .then(() => {
             if (refreshData) {
                 refreshData();
@@ -46,7 +54,7 @@ var targetDown = function() {
         });
 }
 var timeUp = function() {
-    fetch(baseUrl + '/time-inc')
+    fetch(baseUrl + '/time-inc?key='+key)
         .then(() => {
             if (refreshData) {
                 refreshData();
@@ -54,7 +62,7 @@ var timeUp = function() {
         });
 }
 var timeDown = function() {
-    fetch(baseUrl + '/time-dec')
+    fetch(baseUrl + '/time-dec?key='+key)
         .then(() => {
             if (refreshData) {
                 refreshData();
@@ -63,105 +71,38 @@ var timeDown = function() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    var updateFrequency = 500;
+    var updateFrequency = 2000;
     var _digits = document.querySelectorAll('.digit');
 
-    var fetchCurrentTemp = function (callback) {
-        fetch(baseUrl + '/current-temp')
+    var fetchStatus = function (callback) {
+        fetch(baseUrl + '/status?key='+key)
             .then(response => response.json())
             .then(json => callback(null, json))
             .catch(error => callback(error, null))
     }
-    var doFetchCurrentTemp = function () {
-        fetchCurrentTemp((error, temp) => {
+    var doFetchStatus = function () {
+        fetchStatus((error, status) => {
             if (error) {
                 console.log(error)
                 setCurrentTemp(NaN)
-            } else {
-                setCurrentTemp(Math.round(temp))
-            }
-        });
-    }
-    setInterval(doFetchCurrentTemp, updateFrequency)
-    
-    var fetchSetTemp = function (callback) {
-        fetch(baseUrl + '/target-temp')
-            .then(response => response.json())
-            .then(json => callback(null, json))
-            .catch(error => callback(error, null))
-    }
-    var doFetchSetTemp = function () {
-        fetchSetTemp((error, temp) => {
-            if (error) {
-                console.log(error)
                 setSetTemp(NaN)
-            } else {
-                setSetTemp(Math.round(temp))
-            }
-        });
-    }
-    setInterval(doFetchSetTemp, updateFrequency)
-    
-    var fetchCurrentTime = function (callback) {
-        fetch(baseUrl + '/current-time')
-            .then(response => response.json())
-            .then(json => callback(null, json))
-            .catch(error => callback(error, null))
-    }
-    var doFetchCurrentTime = function () {
-        fetchCurrentTime((error, temp) => {
-            if (error) {
-                console.log(error)
                 setCurrentTime(NaN)
-            } else {
-                setCurrentTime(Math.round(temp))
-            }
-        });
-    }
-    setInterval(doFetchCurrentTime, updateFrequency)
-    
-    var fetchHeaterStatus = function (callback) {
-        fetch(baseUrl + '/heater-status')
-            .then(response => response.json())
-            .then(json => callback(null, json))
-            .catch(error => callback(error, null))
-    }
-    var doFetchHeaterStatus = function () {
-        fetchHeaterStatus((error, status) => {
-            if (error) {
-                console.log(error)
                 setHeaterStatus(false)
-            } else {
-                setHeaterStatus(status)
-            }
-        });
-    }
-    setInterval(doFetchHeaterStatus, updateFrequency)
-    
-    var fetchOnoffStatus = function (callback) {
-        fetch(baseUrl + '/onoff-status')
-            .then(response => response.json())
-            .then(json => callback(null, json))
-            .catch(error => callback(error, null))
-    }
-    var doFetchOnoffStatus = function () {
-        fetchOnoffStatus((error, status) => {
-            if (error) {
-                console.log(error)
                 setOnOffStatus(false)
             } else {
-                setOnOffStatus(status)
+                setCurrentTemp(Math.round(status.temperature))
+                setSetTemp(Math.round(status.target))
+                setCurrentTime(Math.round(status.time))
+                setHeaterStatus(status.heater)
+                setOnOffStatus(status.power)
             }
+            console.log(status);
         });
     }
-    setInterval(doFetchOnoffStatus, updateFrequency)
+    setInterval(doFetchStatus, updateFrequency)
 
     refreshData = () => {
-        doFetchCurrentTemp();
-        doFetchSetTemp();
-        doFetchHeaterStatus();
-        doFetchOnoffStatus();
-        doFetchCurrentTime();
+        doFetchStatus();
     }
     refreshData();
     
@@ -187,10 +128,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var setHeaterStatus = function(status) {
         var heaterStatus = document.getElementById("heaterStatus");
         if (heaterStatus) {
+            var newsrc = heaterStatus.src
             if (status) {
-                heaterStatus.src = "/static/heater-on.png";
+                newsrc = "/static/heater-on.png";
             } else {
-                heaterStatus.src = "/static/heater-off.png";
+                newsrc = "/static/heater-off.png";
+            }
+            if (heaterStatus.src!=newsrc) {
+                heaterStatus.src=newsrc
             }
         }
     }
@@ -198,10 +143,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var setOnOffStatus = function(status) {
         var onoffStatus = document.getElementById("onoffStatus");
         if (onoffStatus) {
+            var newsrc = onoffStatus.src
             if (status) {
-                onoffStatus.src = "/static/on.png";
+                newsrc = "/static/on.png";
             } else {
-                onoffStatus.src = "/static/off.png";
+                newsrc = "/static/off.png";
+            }
+            if (onoffStatus.src!=newsrc) {
+                onoffStatus.src=newsrc
             }
         }
     }

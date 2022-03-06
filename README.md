@@ -110,3 +110,7 @@ There is a little latency that annoys me. Honestly, though, honey badger don't c
 I have my Pi set to a static IP on my home network.  My phone has a home link to the web page.  On my work-from-home computer, I have it bookmarked.
 
 When I want to warm up the sauna, I go to the controller web page.  I can turn it on and monitor it from there.
+
+# Auto start chromium
+nano /etc/xdg/openbox/autostart
+chromium-browser --disable-infobars --kiosk --allow-insecure-localhost 'https://localhost?key=YOURKEY'

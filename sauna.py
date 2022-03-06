@@ -8,6 +8,7 @@ from flask import jsonify
 
 app = Flask(__name__)
 
+global API_KEY
 global configsFile
 global configs
 global defaultTime
@@ -24,6 +25,7 @@ global relayPin2
 global timerLastCountdown
 global sensor 
 
+API_KEY = "want2wincodyashley1carolguarino"
 configsFile = "config.json"
 SENSOR_BUS = 0
 SENSOR_CLIENT = 0
@@ -164,26 +166,65 @@ controlSauna()
 
 @app.route("/")
 def hello():
-   now = datetime.datetime.now()
-   timeString = now.strftime("%Y-%m-%d %H:%M")
-   templateData = {
-      'title' : 'Sauna Control',
-      'time': timeString
-      }
-   return render_template('index.html', **templateData)
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+
+    now = datetime.datetime.now()
+    timeString = now.strftime("%Y-%m-%d %H:%M")
+    templateData = {
+        'title' : 'Sauna Control',
+        'time': timeString
+    }
+    return render_template('index.html', **templateData)
+    
+    
+@app.route("/status")
+def getStatus():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+    
+    global currentTemp
+    global targetTemp
+    global currentTime
+    global onoffValue
+    global heaterValue
+    
+    status = {
+        'temperature': currentTemp,
+        'target': targetTemp,
+        'time': currentTime,
+        'power': onoffValue,
+        'heater': heaterValue
+    }   
+    
+    return jsonify(status)
 
 @app.route("/current-temp")
 def getCurrentTemp():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+        
     global currentTemp
     return f"{currentTemp}"
     
 @app.route("/target-temp")
 def getTargetTemp():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+        
     global targetTemp
     return f"{targetTemp}"
     
 @app.route("/target-inc")
 def targetInc():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+        
     global targetTemp
     global defaultTemp
     
@@ -196,6 +237,10 @@ def targetInc():
     
 @app.route("/target-dec")
 def targetDec():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+        
     global targetTemp
     global defaultTemp
     
@@ -208,11 +253,19 @@ def targetDec():
     
 @app.route("/current-time")
 def getCurrentTime():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+        
     global currentTime
     return f"{currentTime}"
     
 @app.route("/time-inc")
 def timeInc():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+        
     global currentTime
     global defaultTime
     
@@ -225,6 +278,10 @@ def timeInc():
     
 @app.route("/time-dec")
 def timeDec():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+        
     global currentTime
     global defaultTime
     
@@ -237,6 +294,10 @@ def timeDec():
     
 @app.route("/onoff-toggle")
 def onoffToggle():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+        
     global defaultTime
     global defaultTemp
     global onoffValue
@@ -255,6 +316,10 @@ def onoffToggle():
     
 @app.route("/onoff-status")
 def onoffStatus():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+        
     global onoffValue
     
     if onoffValue:
@@ -264,6 +329,10 @@ def onoffStatus():
     
 @app.route("/heater-status")
 def heaterStatus():
+    global API_KEY
+    if (request.args.get("key")!=API_KEY):
+        abort(403)
+        
     global heaterValue
     
     if heaterValue:
@@ -272,5 +341,6 @@ def heaterStatus():
         return "0"
     
 if __name__ == "__main__":
-   app.run(host='0.0.0.0', port=80, debug=False)
+   app.run(host='0.0.0.0', port=8080, debug=False)
+#   app.run(host='0.0.0.0', port=8443, debug=False, ssl_context="adhoc")
    
